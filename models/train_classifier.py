@@ -49,7 +49,10 @@ def tokenize(text):
 
 
 def build_model():
-    randomforest = RandomForestClassifier()
+    randomforest = RandomForestClassifier(criterion = 'gini', max_depth=None)
+    # parameters which I intended to use after GridSearch, but resulting model is too large:
+    # randomforest = RandomForestClassifier(criterion='gini', max_depth=None, n_estimators=50)
+
     pipeline = Pipeline([
         ('vect', CountVectorizer(tokenizer=tokenize)),
         ('tfidf', TfidfTransformer()),
