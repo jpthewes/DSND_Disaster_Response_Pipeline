@@ -6,6 +6,7 @@ from sqlalchemy import create_engine
 
 
 def load_data(messages_filepath, categories_filepath):
+    ''' Loads data from hardcoded csv's into a pandas dataframe.'''
     # get data and merge to one df
     messages = pd.read_csv('../data/disaster_messages.csv')
     categories = pd.read_csv('../data/disaster_categories.csv')
@@ -15,7 +16,7 @@ def load_data(messages_filepath, categories_filepath):
 
 
 def clean_data(df):
-        
+    ''' Cleans given dataframe.'''
     # Split categories into separate category columns
     categories = pd.DataFrame(df.categories.str.split(';', expand=True))
     row = categories.iloc[0]
@@ -40,6 +41,7 @@ def clean_data(df):
     return df
 
 def save_data(df, database_filename):
+    ''' Saves given dataframe into a sqlite database.'''
     # save to sql database
     engine = create_engine('sqlite:///' + database_filename)
     df.to_sql('messages_categories', engine, index=False) 

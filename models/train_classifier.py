@@ -23,6 +23,7 @@ nltk.download('wordnet')
 
 
 def load_data(database_filepath):
+    ''' Loads data from database and return X, Y and category_names. '''
     engine = create_engine('sqlite:///' + database_filepath)
     df = pd.read_sql_table('messages_categories', engine)
     # split in X and Y
@@ -34,6 +35,7 @@ def load_data(database_filepath):
     return X, Y, category_names
 
 def tokenize(text):
+    '''Tokenizes a given text (including cleaning, normalization and lemmatizing)'''
     # remove special characters
     text = re.sub("[^a-zA-Z0-9]", " ", text)
     
@@ -49,6 +51,7 @@ def tokenize(text):
 
 
 def build_model():
+    ''' Builds a classifier using a Pipeline.'''
     randomforest = RandomForestClassifier(criterion = 'gini', max_depth=None)
     # parameters which I intended to use after GridSearch, but resulting model is too large:
     # randomforest = RandomForestClassifier(criterion='gini', max_depth=None, n_estimators=50)
@@ -58,7 +61,6 @@ def build_model():
         ('tfidf', TfidfTransformer()),
         ('clf', MultiOutputClassifier(randomforest))
     ])
-    # TODO!! params
     return pipeline
 
 
