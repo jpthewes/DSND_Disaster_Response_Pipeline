@@ -1,6 +1,8 @@
 import sys
 import pandas as pd
 import sqlite3
+import os
+
 
 from sqlalchemy import create_engine
 
@@ -8,8 +10,8 @@ from sqlalchemy import create_engine
 def load_data(messages_filepath, categories_filepath):
     ''' Loads data from hardcoded csv's into a pandas dataframe.'''
     # get data and merge to one df
-    messages = pd.read_csv('../data/disaster_messages.csv')
-    categories = pd.read_csv('../data/disaster_categories.csv')
+    messages = pd.read_csv(os.path.join(os.path.dirname(os.path.realpath(__file__)), 'disaster_messages.csv'))
+    categories = pd.read_csv(os.path.join(os.path.dirname(os.path.realpath(__file__)),'disaster_categories.csv'))
     df = messages.merge(categories, on='id')
 
     return df
@@ -30,6 +32,9 @@ def clean_data(df):
     
     # convert column from string to numeric
         categories[column] = categories[column].astype(int)
+    
+    # drop columns with non-binary values
+        categories.drop(categories.loc[categories[column]==2].index, inplace=True)
 
     # Replace categories column in df with new category columns
     df = df.drop(columns="categories")
