@@ -8,17 +8,34 @@ from sqlalchemy import create_engine
 
 
 def load_data(messages_filepath, categories_filepath):
-    ''' Loads data from hardcoded csv's into a pandas dataframe.'''
+    '''
+    Loads data from hardcoded csv's into a pandas dataframe.
+    
+    Arguments:
+    messages_filepath: filepath of messages.csv
+    categories_filepath: filepath of categories.csv
+    
+    Returns:
+    df: pandas dataframe with merged data
+    '''
     # get data and merge to one df
-    messages = pd.read_csv(os.path.join(os.path.dirname(os.path.realpath(__file__)), 'disaster_messages.csv'))
-    categories = pd.read_csv(os.path.join(os.path.dirname(os.path.realpath(__file__)),'disaster_categories.csv'))
+    messages = pd.read_csv(messages_filepath)
+    categories = pd.read_csv(categories_filepath)
     df = messages.merge(categories, on='id')
 
     return df
 
 
 def clean_data(df):
-    ''' Cleans given dataframe.'''
+    '''
+    Cleans given dataframe.
+    
+    Arguments:
+    df: pandas dataframe to be cleaned
+    
+    Returns:
+    df: pandas dataframe containing cleaned data
+    '''
     # Split categories into separate category columns
     categories = pd.DataFrame(df.categories.str.split(';', expand=True))
     row = categories.iloc[0]
@@ -42,14 +59,26 @@ def clean_data(df):
 
     # remove duplicates
     df = df.drop_duplicates()
+    
+    # remove NaN values
+    df = df.dropna()
 
     return df
 
 def save_data(df, database_filename):
-    ''' Saves given dataframe into a sqlite database.'''
+    '''
+    Saves given dataframe into a sqlite database.
+    
+    Arguments:
+    df: pandas dataframe to be saved
+    database_filename: filename for target database
+    
+    Returns:
+    None
+    '''
     # save to sql database
     engine = create_engine('sqlite:///' + database_filename)
-    df.to_sql('messages_categories', engine, index=False) 
+    df.to_sql('messages_categories', engine, index=False, if_exists='replace') 
 
 
 def main():

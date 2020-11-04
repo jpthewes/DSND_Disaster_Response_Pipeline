@@ -23,7 +23,17 @@ nltk.download('wordnet')
 
 
 def load_data(database_filepath):
-    ''' Loads data from database and return X, Y and category_names. '''
+    '''
+    Loads data from database and return X, Y and category_names.
+    
+    Arguments:
+    database_filepath: filepath for source database
+    
+    Returns:
+    X: Input variables
+    Y: Target variables in dataframe
+    category_names: names of the target variables
+    '''
     engine = create_engine('sqlite:///' + database_filepath)
     df = pd.read_sql_table('messages_categories', engine)
     # split in X and Y
@@ -35,7 +45,15 @@ def load_data(database_filepath):
     return X, Y, category_names
 
 def tokenize(text):
-    '''Tokenizes a given text (including cleaning, normalization and lemmatizing)'''
+    '''
+    Tokenizes a given text (including cleaning, normalization and lemmatizing)
+
+    Arguments:
+    text: text string to be tokenized
+    
+    Returns:
+    clean_tokens: list of tokenized words
+    '''
     # remove special characters
     text = re.sub("[^a-zA-Z0-9]", " ", text)
     
@@ -51,10 +69,17 @@ def tokenize(text):
 
 
 def build_model():
-    ''' Builds a classifier using a Pipeline.'''
-    randomforest = RandomForestClassifier(criterion = 'gini', max_depth=None)
-    # parameters which I intended to use after GridSearch, but resulting model is too large:
-    # randomforest = RandomForestClassifier(criterion='gini', max_depth=None, n_estimators=50)
+    '''
+    Builds a classifier using a Pipeline.
+    
+    Arguments:
+    None
+    
+    Returns:
+    pipeline: nltk Pipeline encapsulating the transformer and classifier
+    '''
+    # parameters which fitted best after GridSearch:
+    randomforest = RandomForestClassifier(criterion='gini', max_depth=None, n_estimators=50)
 
     pipeline = Pipeline([
         ('vect', CountVectorizer(tokenizer=tokenize)),
@@ -65,6 +90,18 @@ def build_model():
 
 
 def evaluate_model(model, X_test, y_test, category_names):
+    '''
+    Evaluates a model based on the test predictions and prints the output.
+    
+    Arguments:
+    model: model to be evaluated
+    X_test: input variables for test prediction
+    y_test: true output variables
+    category_names: list of names of output variables
+    
+    Returns:
+    None
+    '''
     y_pred = model.predict(X_test)
     for i, c in enumerate(y_test.columns): 
         print("category: ", c) 
@@ -72,6 +109,16 @@ def evaluate_model(model, X_test, y_test, category_names):
 
 
 def save_model(model, model_filepath):
+    '''
+    Saves a ML model to a given filepath a pickle file.
+    
+    Arguments:
+    model: model to be saved
+    model_filepath: target filepath of model pickel file
+    
+    Returns:
+    None
+    '''
     pickle.dump(model, open(model_filepath, 'wb'))
 
 
